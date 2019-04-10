@@ -12,10 +12,7 @@ class Lyrics extends React.Component {
   }
   
   setupLyrics(){
-	  var s = "[00:00.00]";
-	  s += `
-[00:05.81]One Direction -What Makes You Beautiful
-[00:07.69]You're insecure
+	  var s = `[00:07.69]You're insecure
 [00:09.66]Don't know what for
 [00:11.42]You're turning heads through the door
 [00:15.18]Don't need make-up
@@ -97,12 +94,7 @@ class Lyrics extends React.Component {
   
   getLine(num) {
 	var s = '';
-	const lyrics = [
-		{time: 0, line: 'oh say can you see'},
-		{time: 200, line: 'by the dawns early light'},
-		{time: 400, line: 'what so proudly we hailed'},
-		{time: 600, line: 'at the twilights last gleaming'}
-	];
+
 	this.state.lyrics.map((lyric) => {
 		if (num >= lyric.time) {
 			s = lyric.line;
@@ -127,11 +119,14 @@ class Lyrics extends React.Component {
         elapsed: 0
       });
     }
+	console.log(document.getElementById("uploader").value);
+	document.getElementById("player").setAttribute("src", document.getElementById("uploader").value.split('\\').pop().split('/').pop());
+	document.getElementById("player").play();
 	this.startTimer();
   }
 
   render() {
-	this.setupLyrics();  
+	this.setupLyrics();
 	
     if (this.state.elapsed != -1) {
       return this.getLine(this.getTime());
