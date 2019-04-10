@@ -7,7 +7,9 @@
   <body>
   
   <audio id="player"></audio>
-  <input type="file" id="uploader" />
+  
+  <h4>MP3: <input type="file" id="input" /></h4>
+  <h4>LRC: <input type="file" id="lrcinput" /></h4>
     
     <h2>Lyrics:</h2>
 	
@@ -15,7 +17,7 @@
 
     <!-- We will put our React component inside this div. -->
     <div id="container"></div>
-
+	
     <!-- Load React. -->
     <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
@@ -23,6 +25,14 @@
 
     <!-- Load our React component. -->
     <script src="lyrics.js"></script>
+	
+	<script>
+		var input = document.getElementById('input');
+		input.onchange = function(e){
+			var player = document.getElementById('player');
+			player.src = URL.createObjectURL(this.files[0]);
+		}
+	</script>
 
   </body>
 </html>
