@@ -76,6 +76,13 @@ class Lyrics extends React.Component {
       document.getElementById("lyrics").innerHTML = this.getLine(this.getTime());
 	  return "";
     }
+	
+	var self = this;
+	
+	var vid = document.getElementById("player");
+
+	// Assign an ontimeupdate event to the <video> element, and execute a function if the current playback position has changed
+	vid.ontimeupdate = function() {self.state.elapsed = vid.currentTime * 100;};
 
     return e(
       'button',
