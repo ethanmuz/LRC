@@ -11,23 +11,18 @@ class Lyrics extends React.Component {
 	};
   }
   
-  setupLyrics(){
-	var s = "";
-	
-	var fileToLoad = document.getElementById("lrcinput").files[0];
-	var fileReader = new FileReader();
-	fileReader.onload = function(fileLoadedEvent){
-		s = fileLoadedEvent.target.result;
-		document.getElementById("text").innerHTML = s;
-	};
-
-    fileReader.readAsText(fileToLoad, "UTF-8");
-	  
-	var lines = s.split(/\r?\n/);
-	lines.map((line) => this.addLine(line));
+  setupLyrics(){	
+	var self = this;
+	var file = document.getElementById("lrcinput").files[0];
+    var reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = function (evt) {
+		var lines = evt.target.result.split(/\r?\n/);
+		lines.map((line) => self.addLine(line));
+    }
   }
   
-  addLine(lyricLine){
+  addLine(lyricLine){	  
 	  var minutes = parseInt(lyricLine.substring(1,3));
 	  var seconds = parseInt(lyricLine.substring(4,6));
 	  var fractions = parseInt(lyricLine.substring(7,9));
@@ -78,7 +73,8 @@ class Lyrics extends React.Component {
 
   render() {	
     if (this.state.elapsed != -1) {
-      return this.getLine(this.getTime());
+      document.getElementById("lyrics").innerHTML = this.getLine(this.getTime());
+	  return "";
     }
 
     return e(
