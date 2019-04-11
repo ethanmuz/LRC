@@ -1,19 +1,45 @@
 'use strict';
 
-const e = React.createElement;
-
-class Lyrics extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-		elapsed: -1,
-		lyrics: []
+class Lyrics {
+  
+  constructor(){
+	var self = this;
+	
+	this.lyricsText = document.getElementById("lyrics");
+	this.elapsed = -1;
+	this.lyrics = [];
+	
+	this.player = document.getElementById("player");
+	this.player.ontimeupdate = function() {self.elapsed = self.player.currentTime * 100;};
+	this.player.onpause = function() {self.playerWasPaused()};
+	this.player.onplay = function() {self.playerWasPlayed()};
+	this.player.onended = function() {
+		self.elapsed = -1;
+		self.player.currentTime = 0;
+		self.lyricsText.innerHTML = "";
 	};
+	this.startbutton = document.getElementById("startbutton");
+	this.stopbutton = document.getElementById("stopbutton");
+	this.startbutton.onclick = function(){
+		self.player.play();
+	};
+	this.stopbutton.onclick = function(){
+		self.player.pause();
+	};
+	this.mp3upload = document.getElementById('mp3upload');
+	this.mp3upload.onchange = function(e){
+		self.player.src = URL.createObjectURL(this.files[0]);
+	}
+	this.lrcupload = document.getElementById('lrcupload');
+	this.lrcupload.onchange = function(e){
+		self.lyrics = [];
+		self.setupLyrics();
+	}
   }
   
   setupLyrics(){	
 	var self = this;
-	var file = document.getElementById("lrcinput").files[0];
+	var file = this.lrcupload.files[0];
     var reader = new FileReader();
     reader.readAsText(file, "UTF-8");
     reader.onload = function (evt) {
@@ -27,21 +53,17 @@ class Lyrics extends React.Component {
 	  var seconds = parseInt(lyricLine.substring(4,6));
 	  var fractions = parseInt(lyricLine.substring(7,9));
 	  var words = lyricLine.substring(10);
-	  
+	 
 	  seconds = (minutes * 60) + seconds;
-	  fractions = (seconds * 100) + seconds;
+	  fractions = (seconds * 100) + fractions;
 	  
-	  this.state.lyrics.push({time: fractions, line: words});
-  }
-  
-  getTime() {
-    return this.state.elapsed;
+	  this.lyrics.push({time: fractions, line: words});
   }
   
   getLine(num) {
 	var s = '';
 
-	this.state.lyrics.map((lyric) => {
+	this.lyrics.map((lyric) => {
 		if (num >= lyric.time) {
 			s = lyric.line;
 		}
@@ -49,48 +71,24 @@ class Lyrics extends React.Component {
 	return s;
   }
   
-  startTimer(){
-	var _this = this;
-	this.incrementer = setInterval(function () {
-      _this.setState({
-        elapsed: (_this.state.elapsed + 1)
-      });
-    }, 10);
-  }
-
-  handleStartClick() {
-	this.setupLyrics();
-    var _this = this;
-	if (this.state.elapsed == -1) {
-        _this.setState({
-        elapsed: 0
-      });
-    }
-	document.getElementById("player").play();
-	this.startTimer();
+  playerWasPaused() {
+	this.startbutton.style = "";
+	this.stopbutton.style = "display: none;";
+	clearInterval(this.incrementer);
   }
   
-
-  render() {	
-    if (this.state.elapsed != -1) {
-      document.getElementById("lyrics").innerHTML = this.getLine(this.getTime());
-	  return "";
-    }
-	
+  playerWasPlayed() {
 	var self = this;
-	
-	var vid = document.getElementById("player");
-
-	// Assign an ontimeupdate event to the <video> element, and execute a function if the current playback position has changed
-	vid.ontimeupdate = function() {self.state.elapsed = vid.currentTime * 100;};
-
-    return e(
-      'button',
-      { onClick: () => this.handleStartClick() },
-      'Start'
-    );
+	if (this.elapsed == -1) {
+        this.elapsed = 0;
+    }
+	this.startbutton.style = "display: none;";
+	this.stopbutton.style = "";
+	this.incrementer = setInterval(function () {
+      self.elapsed = self.player.currentTime * 100;
+	  self.lyricsText.innerHTML = self.getLine(self.elapsed);
+    }, 10);
   }
 }
 
-const domContainer = document.querySelector('#container');
-ReactDOM.render(e(Lyrics), domContainer);
+let lyricsClass = new Lyrics();
