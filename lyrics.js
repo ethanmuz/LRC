@@ -14,9 +14,7 @@ class Lyrics {
 	this.player.onpause = function() {self.playerWasPaused()};
 	this.player.onplay = function() {self.playerWasPlayed()};
 	this.player.onended = function() {
-		self.elapsed = -1;
-		self.player.currentTime = 0;
-		self.lyricsText.innerHTML = "";
+		self.stopPlay();
 	};
 	this.startbutton = document.getElementById("startbutton");
 	this.stopbutton = document.getElementById("stopbutton");
@@ -28,12 +26,18 @@ class Lyrics {
 	};
 	this.mp3upload = document.getElementById('mp3upload');
 	this.mp3upload.onchange = function(e){
-		self.player.src = URL.createObjectURL(this.files[0]);
+		if (this.files[0] != undefined){
+			self.stopPlay();
+			self.player.src = URL.createObjectURL(this.files[0]);
+		}
 	}
 	this.lrcupload = document.getElementById('lrcupload');
 	this.lrcupload.onchange = function(e){
-		self.lyrics = [];
-		self.setupLyrics();
+		if (this.files[0] != undefined){
+			self.stopPlay();
+			self.lyrics = [];
+			self.setupLyrics();
+		}
 	}
   }
   
@@ -75,6 +79,14 @@ class Lyrics {
 	this.startbutton.style = "";
 	this.stopbutton.style = "display: none;";
 	clearInterval(this.incrementer);
+  }
+  
+  stopPlay(){
+	  this.playerWasPaused();
+	  this.lyricsText.innerHTML = "";
+	  this.player.pause();
+	  this.player.currentTime = 0;
+	  this.elapsed = -1;
   }
   
   playerWasPlayed() {
