@@ -6,100 +6,237 @@ class Lyrics {
 	var self = this;
 	
 	this.lyricsText = document.getElementById("lyrics");
-	this.elapsed = -1;
 	this.lyrics = [];
 	
 	this.player = document.getElementById("player");
-	this.player.ontimeupdate = function() {self.elapsed = self.player.currentTime * 100;};
-	this.player.onpause = function() {self.playerWasPaused()};
-	this.player.onplay = function() {self.playerWasPlayed()};
+	this.player.ontimeupdate = function() {
+		self.lyricsText.innerHTML = self.getLine();
+		document.getElementById("currenttime").innerHTML = self.getTimeStringFromCentiseconds(self.player.currentTime * 100, Math.floor);
+	};
 	this.player.onended = function() {
-		self.stopPlay();
+		self.stop();
+	};
+	this.player.onloadedmetadata = function() {
+		self.timeslider.max = self.player.duration * 100;
+		document.getElementById("totaltime").innerHTML =  self.getTimeStringFromCentiseconds(self.timeslider.max, Math.ceil);
 	};
 	this.startbutton = document.getElementById("startbutton");
 	this.stopbutton = document.getElementById("stopbutton");
 	this.startbutton.onclick = function(){
-		self.player.play();
+		if (self.player.src){
+			self.play();
+		}
 	};
 	this.stopbutton.onclick = function(){
-		self.player.pause();
+		self.pause();
 	};
-	this.mp3upload = document.getElementById('mp3upload');
-	this.mp3upload.onchange = function(e){
-		if (this.files[0] != undefined){
-			self.stopPlay();
-			self.player.src = URL.createObjectURL(this.files[0]);
-		}
+	this.timeslider = document.getElementById("timeslider");
+	timeslider.oninput = function() {
+		self.player.currentTime = this.value / 100;
 	}
-	this.lrcupload = document.getElementById('lrcupload');
-	this.lrcupload.onchange = function(e){
-		if (this.files[0] != undefined){
-			self.stopPlay();
-			self.lyrics = [];
-			self.setupLyrics();
-		}
-	}
+	this.songselector = document.getElementById("songselector");
+	this.songselector.onchange = function(){
+		self.stop();
+		var songname = self.songselector.value;
+		self.player.src = "https://s3.us-east-2.amazonaws.com/ethanmuz.lrc/" + songname + ".mp3";
+		self.setupLyrics(songname);
+	};
+	this.stop();
+	this.setupSongOptions();
   }
   
-  setupLyrics(){	
+  getTimeStringFromCentiseconds(cs, func){
+	  var string = "";
+	  var minutes = Math.floor(cs / 6000) % 60;
+	  var seconds = func((cs / 100) % 60);
+	  if (seconds < 10){seconds = "0" + seconds;}
+	  return minutes + ":" + seconds;
+  }
+  
+  setupLyrics(songname){	
 	var self = this;
-	var file = this.lrcupload.files[0];
-    var reader = new FileReader();
-    reader.readAsText(file, "UTF-8");
+	this.lyrics = [];
+	var reader = new FileReader();
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			reader.readAsText(xhttp.response, "UTF-8");
+		}
+	};
+	xhttp.open("GET", "https://s3.us-east-2.amazonaws.com/ethanmuz.lrc/" + songname + ".lrc", true);
+	xhttp.responseType = "blob";
+	xhttp.send();
     reader.onload = function (evt) {
 		var lines = evt.target.result.split(/\r?\n/);
 		lines.map((line) => self.addLine(line));
     }
   }
   
-  addLine(lyricLine){	  
-	  var minutes = parseInt(lyricLine.substring(1,3));
-	  var seconds = parseInt(lyricLine.substring(4,6));
-	  var fractions = parseInt(lyricLine.substring(7,9));
-	  var words = lyricLine.substring(10);
+  addLine(lyricLine){
+	  if (!isNaN(lyricLine.substring(1,2))){
+	    var minutes = parseInt(lyricLine.substring(1,3));
+	    var seconds = parseInt(lyricLine.substring(4,6));
+	    var fractions = parseInt(lyricLine.substring(7,9));
+	    var words = lyricLine.substring(10);
 	 
-	  seconds = (minutes * 60) + seconds;
-	  fractions = (seconds * 100) + fractions;
+	    seconds = (minutes * 60) + seconds;
+	    fractions = (seconds * 100) + fractions;
 	  
-	  this.lyrics.push({time: fractions, line: words});
+	    this.lyrics.push({time: fractions, line: words});
+	  }
   }
   
-  getLine(num) {
+  getLine() {
 	var s = '';
+	var timeElapsed = this.player.currentTime * 100;
 
 	this.lyrics.map((lyric) => {
-		if (num >= lyric.time) {
+		if (timeElapsed >= lyric.time) {
 			s = lyric.line;
 		}
 	});
 	return s;
   }
   
-  playerWasPaused() {
+  pause() {
+	this.player.pause();
 	this.startbutton.style = "";
 	this.stopbutton.style = "display: none;";
 	clearInterval(this.incrementer);
   }
   
-  stopPlay(){
-	  this.playerWasPaused();
+  stop(){
+	  this.pause();
 	  this.lyricsText.innerHTML = "";
 	  this.player.pause();
 	  this.player.currentTime = 0;
-	  this.elapsed = -1;
+	  this.timeslider.value = this.player.currentTime;
   }
   
-  playerWasPlayed() {
+  play() {
 	var self = this;
-	if (this.elapsed == -1) {
-        this.elapsed = 0;
-    }
+	this.player.play();
 	this.startbutton.style = "display: none;";
 	this.stopbutton.style = "";
 	this.incrementer = setInterval(function () {
-      self.elapsed = self.player.currentTime * 100;
-	  self.lyricsText.innerHTML = self.getLine(self.elapsed);
+	  self.timeslider.value = self.player.currentTime * 100;
+	  self.lyricsText.innerHTML = self.getLine();
     }, 10);
+  }
+  
+  setupSongOptions() {
+	  var songlist = `1Train
+3500
+90210
+All Ass
+Antidote
+Apple Pie
+ASTROTHUNDER
+Bad and Boujee (feat. Lil Uzi Vert)
+Bank
+Bars
+beibs in the trap
+Big On Big
+Big Rings
+Boss Bitch
+Brown Paper Bag
+BUTTERFLY EFFECT
+Call Casting
+Can't Feel My Face
+CAN'T SAY
+CAROUSEL
+Cocaine Castle
+Cocoon
+coordinate
+Curve (feat. The Weeknd)
+Deadz (feat. 2 Chainz)
+Drip Too Hard
+Dump Dump
+Everyday
+Exotic
+Feds Watching
+First Class
+Fit In
+Freak No More
+Fuck Out My Face
+Fuckin' Problems
+Get Right Witcha
+goosebumps
+Handsome And Wealthy
+Heartless
+Hood Pope
+Hook Up
+HOUSTONFORNICATION
+How To Love
+HYFR (Hell Ya Fucking Right)
+HAM
+I Can Tell
+I Get The Bag (feat. Migos)
+I'm Straight
+Impossible
+Jersey
+Jumpman
+Kelly Price (feat. Travis Scott)
+Let It Go
+Long Live A$AP
+Lord Pretty Flacko Jodye 2 (LPFJ2)
+Love Me
+Lucid Dreams
+Mamacita
+Money Longer
+Moon Rock
+My Dawg
+Myself
+NC-17
+Never Needed No Help
+Never Recover
+Nightcrawler
+NO BYSTANDERS
+Oh My Dis Side
+outside
+pick up the phone
+Pornography
+Reminder
+Rich As Fuck
+Right Now
+sdp interlude
+Seals Pills
+Shabba
+SICKO MODE
+Sides
+SKELETONS
+Slippery (feat. Gucci Mane)
+STARGAZING
+Still Here
+Swimming Pools (Drank)
+T-Shirt
+the ends
+The Hills
+through the late night
+Throwing Shade
+Tone it Down (feat. Chris Brown)
+Too Hotty
+Transporter
+untitled 07 levitate
+WAKE UP
+way back
+What The Price
+Wishy Washy
+WOA
+wonderful
+XO TOUR Llif3
+Yes Indeed
+YOSEMITE
+You Was Right`
+	  var songs = songlist.split(/\r?\n/);
+	  songs.map((song) => this.addSongToSelector(song));
+  }
+  
+  addSongToSelector(songname){
+    var opt = document.createElement('option');
+    opt.value = songname;
+    opt.innerHTML = songname;
+    this.songselector.appendChild(opt);
   }
 }
 

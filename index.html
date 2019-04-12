@@ -3,14 +3,57 @@
 	<head>
 		<title>Lyrics</title>
 	</head>
+	<style>
+		h1,
+		div {
+			display: inline;
+			padding-left: 10px;
+			padding-right: 10px;
+		}
+		.slider {
+		    -webkit-appearance: none;
+		    width: 50%;
+		    height: 20px;
+		    border-radius: 5px;   
+		    background: #d3d3d3;
+		    opacity: 0.5;
+		}
+
+		.slider::-webkit-slider-thumb {
+		    -webkit-appearance: none;
+		    width: 30px;
+		    height: 30px;
+		    border-radius: 50%; 
+		    background: #000000;
+		    cursor: pointer;
+		}
+
+		.slider::-moz-range-thumb {
+		    width: 30px;
+		    height: 30px;
+		    border-radius: 50%;
+		    background: #000000;
+		    cursor: pointer;
+		}
+	</style>
 	<body><center>
-		<h4>MP3: <input type="file" id="mp3upload" /></h4>
-		<h4>LRC: <input type="file" id="lrcupload" /></h4>
+		<!--<h4>MP3: <input type="file" id="mp3upload" /></h4>
+		<h4>LRC: <input type="file" id="lrcupload" /></h4>-->
+		<select id="songselector" ><option selected disabled>Select a song</option></select>
+		</br>
+		</br>
 		<img id="startbutton" src="images/play.png"></img>
 		<img id="stopbutton" src="images/pause.jpg" style="display: none;"></img>
 		</br>
 		</br>
-		<audio id="player" controls></audio>
+		<audio id="player"></audio>
+		<div>
+			<h1 id="currenttime">0:00</h1>
+		  	<input type="range" min="0" max="100" value="0" class="slider" id="timeslider">
+			<h1 id="totaltime">0:00</h1>
+		</div>
+		</br>
+		</br>
 		<h1>Lyrics:</h1>
 		<h2 id="lyrics"></h2>
 		
