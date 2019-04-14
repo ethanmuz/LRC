@@ -11,6 +11,7 @@ class Lyrics {
 	this.player = document.getElementById("player");
 	this.player.ontimeupdate = function() {
 		self.lyricsText.innerHTML = self.getLine();
+		console.log(self.getLine());
 		document.getElementById("currenttime").innerHTML = self.getTimeStringFromCentiseconds(self.player.currentTime * 100, Math.floor);
 	};
 	this.player.onended = function() {
@@ -33,6 +34,7 @@ class Lyrics {
 	this.timeslider = document.getElementById("timeslider");
 	timeslider.oninput = function() {
 		self.player.currentTime = this.value / 100;
+		
 	}
 	this.songselector = document.getElementById("songselector");
 	this.songselector.onchange = function(){
@@ -111,6 +113,7 @@ class Lyrics {
 	  this.player.pause();
 	  this.player.currentTime = 0;
 	  this.timeslider.value = this.player.currentTime;
+	  document.getElementById("currenttime").innerHTML = this.getTimeStringFromCentiseconds(this.player.currentTime * 100, Math.floor);
   }
   
   play() {
