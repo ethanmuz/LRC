@@ -15,7 +15,7 @@ http.createServer(function (req, res) {
 	var songs = getSongList(data);
 	res.end(JSON.stringify(arrayToJSON(songs)));
   });
-}).listen(8080);
+}).listen(3000);
 
 function getSongList(json){
 	var names = [];
