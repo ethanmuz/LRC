@@ -131,7 +131,7 @@ class Lyrics {
   setupSongOptions(url) {
 	var songs = [];
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', "ec2-184-72-112-67.compute-1.amazonaws.com", true);
+	xhr.open('GET', "ec2-3-86-251-183.compute-1.amazonaws.com", true);
 	xhr.send();
  
 	xhr.onreadystatechange = function(e){
