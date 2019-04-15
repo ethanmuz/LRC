@@ -2,19 +2,23 @@
 
 class Lyrics {
   
-  constructor(){
+  constructor(url){
 	var self = this;
 	
-	this.stop();
-	this.setupSongOptions();
-	
-	this.lyrics = [];
+	this.player = document.getElementById("player");
+	this.startbutton = document.getElementById("startbutton");
+	this.stopbutton = document.getElementById("stopbutton");
+	this.timeslider = document.getElementById("timeslider");
+	this.songselector = document.getElementById("songselector");
 	this.lyricsText = document.getElementById("lyrics");
 	
-	this.player = document.getElementById("player");
+	this.stop();
+	this.setupSongOptions(url);
+	
+	this.lyrics = [];
+	
 	this.player.ontimeupdate = function() {
 		self.lyricsText.innerHTML = self.getLine();
-		console.log(self.getLine());
 		document.getElementById("currenttime").innerHTML = self.getTimeStringFromCentiseconds(self.player.currentTime * 100, Math.floor);
 	};
 	this.player.onended = function() {
@@ -24,8 +28,6 @@ class Lyrics {
 		self.timeslider.max = self.player.duration * 100;
 		document.getElementById("totaltime").innerHTML =  self.getTimeStringFromCentiseconds(self.timeslider.max, Math.ceil);
 	};
-	this.startbutton = document.getElementById("startbutton");
-	this.stopbutton = document.getElementById("stopbutton");
 	this.startbutton.onclick = function(){
 		if (self.player.src){
 			self.play();
@@ -34,17 +36,15 @@ class Lyrics {
 	this.stopbutton.onclick = function(){
 		self.pause();
 	};
-	this.timeslider = document.getElementById("timeslider");
 	timeslider.oninput = function() {
 		self.player.currentTime = this.value / 100;
 		
 	}
-	this.songselector = document.getElementById("songselector");
 	this.songselector.onchange = function(){
 		self.stop();
 		var songname = self.songselector.value;
-		self.player.src = "https://s3.us-east-2.amazonaws.com/ethanmuz.lrc/" + songname + ".mp3";
 		self.setupLyrics(songname);
+		self.player.src = "https://s3.us-east-2.amazonaws.com/ethanmuz.lrc/" + songname + ".mp3";
 	};
   }
   
@@ -128,112 +128,20 @@ class Lyrics {
     }, 10);
   }
   
-  setupSongOptions() {
-	  var songlist = `1Train
-3500
-90210
-All Ass
-Antidote
-Apple Pie
-ASTROTHUNDER
-Bad and Boujee (feat. Lil Uzi Vert)
-Bank
-Bars
-beibs in the trap
-Big On Big
-Big Rings
-Boss Bitch
-Brown Paper Bag
-BUTTERFLY EFFECT
-Call Casting
-Can't Feel My Face
-CAN'T SAY
-CAROUSEL
-Cocaine Castle
-Cocoon
-coordinate
-Curve (feat. The Weeknd)
-Deadz (feat. 2 Chainz)
-Drip Too Hard
-Dump Dump
-Everyday
-Exotic
-Feds Watching
-First Class
-Fit In
-Freak No More
-Fuck Out My Face
-Fuckin' Problems
-Get Right Witcha
-goosebumps
-Handsome And Wealthy
-Heartless
-Hood Pope
-Hook Up
-HOUSTONFORNICATION
-How To Love
-HYFR (Hell Ya Fucking Right)
-HAM
-I Can Tell
-I Get The Bag (feat. Migos)
-I'm Straight
-Impossible
-Jersey
-Jumpman
-Kelly Price (feat. Travis Scott)
-Let It Go
-Long Live A$AP
-Lord Pretty Flacko Jodye 2 (LPFJ2)
-Love Me
-Lucid Dreams
-Mamacita
-Money Longer
-Moon Rock
-My Dawg
-Myself
-NC-17
-Never Needed No Help
-Never Recover
-Nightcrawler
-NO BYSTANDERS
-Oh My Dis Side
-outside
-pick up the phone
-Pornography
-Reminder
-Rich As Fuck
-Right Now
-sdp interlude
-Seals Pills
-Shabba
-SICKO MODE
-Sides
-SKELETONS
-Slippery (feat. Gucci Mane)
-STARGAZING
-Still Here
-Swimming Pools (Drank)
-T-Shirt
-the ends
-The Hills
-through the late night
-Throwing Shade
-Tone it Down (feat. Chris Brown)
-Too Hotty
-Transporter
-untitled 07 levitate
-WAKE UP
-way back
-What The Price
-Wishy Washy
-WOA
-wonderful
-XO TOUR Llif3
-Yes Indeed
-YOSEMITE
-You Was Right`
-	  var songs = songlist.split(/\r?\n/);
-	  songs.map((song) => this.addSongToSelector(song));
+  setupSongOptions(url) {
+	var songs = [];
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', "http://api.plos.org/search?q=title:DNA", true);
+	xhr.send();
+ 
+	xhr.onreadystatechange = function(e){
+		if (xhr.readyState == 4 && xhr.status == 200) {
+			var response = JSON.parse(xhr.responseText);
+			console.log(response.response.numFound);
+		}
+	};
+
+	songs.map((song) => this.addSongToSelector(song));
   }
   
   addSongToSelector(songname){
@@ -244,4 +152,6 @@ You Was Right`
   }
 }
 
-let lyricsClass = new Lyrics();
+var url = "http://api.plos.org/search?q=title:DNA";
+
+let lyricsClass = new Lyrics(url);
