@@ -8,7 +8,7 @@ var params = {
 }
 
 http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'application/json'});
+  res.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
   var self = this;
   s3.listObjects(params, function (err, data) {
     if(err)throw err;
