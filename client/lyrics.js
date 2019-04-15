@@ -129,19 +129,21 @@ class Lyrics {
   }
   
   setupSongOptions(url) {
+	var self = this;
+	  
 	var songs = [];
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', "ec2-3-86-251-183.compute-1.amazonaws.com", true);
+	xhr.open('GET', url, true);
 	xhr.send();
  
 	xhr.onreadystatechange = function(e){
 		if (xhr.readyState == 4 && xhr.status == 200) {
 			var response = JSON.parse(xhr.responseText);
-			console.log(response.response.numFound);
+			songs = response.songs;
+			songs.map((song) => self.addSongToSelector(song));
 		}
 	};
 
-	songs.map((song) => this.addSongToSelector(song));
   }
   
   addSongToSelector(songname){
@@ -152,6 +154,6 @@ class Lyrics {
   }
 }
 
-var url = "http://api.plos.org/search?q=title:DNA";
+var url = "http://ec2-3-86-251-183.compute-1.amazonaws.com/";
 
 let lyricsClass = new Lyrics(url);
