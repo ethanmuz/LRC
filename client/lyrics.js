@@ -36,7 +36,7 @@ class Lyrics {
 	this.stopbutton.onclick = function(){
 		self.pause();
 	};
-	timeslider.oninput = function() {
+	this.timeslider.oninput = function() {
 		self.player.currentTime = this.value / 100;
 		
 	}

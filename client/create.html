@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Create LRC</title>
+	</head>
+	<style>
+		h1,
+		div {
+			display: inline;
+			padding-left: 10px;
+			padding-right: 10px;
+		}
+		.slider {
+		    -webkit-appearance: none;
+		    width: 50%;
+		    height: 20px;
+		    border-radius: 5px;   
+		    background: #d3d3d3;
+		    opacity: 0.5;
+		}
+
+		.slider::-webkit-slider-thumb {
+		    -webkit-appearance: none;
+		    width: 30px;
+		    height: 30px;
+		    border-radius: 50%; 
+		    background: #000000;
+		    cursor: pointer;
+		}
+
+		.slider::-moz-range-thumb {
+		    width: 30px;
+		    height: 30px;
+		    border-radius: 50%;
+		    background: #000000;
+		    cursor: pointer;
+		}
+	</style>
+	<body><center>
+		<h4>MP3: <input type="file" id="upload" /></h4>
+		</br>
+		<img id="startbutton" src="images/play.png"></img>
+		<img id="stopbutton" src="images/pause.jpg" style="display: none;"></img>
+		</br>
+		</br>
+		<audio id="player"></audio>
+		<div>
+			<h1 id="currenttime">0:00</h1>
+		  	<input type="range" min="0" max="100" value="0" class="slider" id="timeslider">
+			<h1 id="totaltime">0:00</h1>
+		</div>
+		</br>
+		<button id="halfspeed">Half speed</button>
+		<button id="fullspeed">Full speed</button>
+		</br>
+		</br>
+		<h2>Enter lyrics here:</h2>
+		<input id="currentLyrics" type="text">
+		</br>
+		</br>
+		<h2>LRC:</h2>
+		<textarea id="lyrics" type="text"></textarea>
+		
+		<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+		<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+		<script src="create.js"></script>
+	</center></body>
+</html>
